@@ -1,1 +1,63 @@
 
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Wishlist</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+        }
+        .wishlist-item {
+            border-bottom: 1px solid #ddd;
+            padding: 10px 0;
+        }
+        .wishlist-item img {
+            width: 100px;
+            height: auto;
+            margin-right: 10px;
+        }
+        .wishlist-item h2 {
+            margin: 0;
+        }
+        .wishlist-item a {
+            text-decoration: none;
+            color: #007BFF;
+        }
+    </style>
+</head>
+<body>
+
+<h1>My Wishlist</h1>
+<div id="wishlist-container"></div>
+
+<script src="https://cdn.jsdelivr.net/gh/4ME280-Webdesign-a-uzivatelska-rozhrani/lord-squeegee-wishlist@main/wishlist.json"></script>
+
+<script>
+    // Function to generate wishlist HTML
+    function generateWishlist(wishlist) {
+        const container = document.getElementById('wishlist-container');
+        wishlist.forEach(item => {
+            const itemDiv = document.createElement('div');
+            itemDiv.classList.add('wishlist-item');
+            itemDiv.innerHTML = `
+                <img src="${item.image}" alt="${item.name}">
+                <h2><a href="${item.url}" target="_blank">${item.name}</a></h2>
+                <p>Price: ${item.price}</p>
+            `;
+            container.appendChild(itemDiv);
+        });
+    }
+
+    // Fetch the JSON data and generate the wishlist
+    fetch("https://cdn.jsdelivr.net/gh/4ME280-Webdesign-a-uzivatelska-rozhrani/lord-squeegee-wishlist@main/wishlist.json")
+        .then(response => response.json())
+        .then(data => generateWishlist(data))
+        .catch(error => console.log("Error loading wishlist data:", error));
+</script>
+
+</body>
+</html>
