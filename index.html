@@ -3,34 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wishlist</title>
+    <title>My Wishlist</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
+            background-color: #f4f4f9;
+            color: #333;
         }
         h1 {
             text-align: center;
-            margin-bottom: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
         .wishlist-item {
-            margin-bottom: 15px;
             border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
             padding-bottom: 10px;
+        }
+        .wishlist-item img {
+            width: 100px;
+            height: auto;
+            margin-right: 15px;
+        }
+        .wishlist-item a {
+            text-decoration: none;
+            color: #007BFF;
         }
     </style>
 </head>
 <body>
 
-<h1>My Wishlist</h1>
-
-<div id="wishlist-container"></div>
+<div class="container">
+    <h1>My Wishlist</h1>
+    <div id="wishlist-container"></div>
+</div>
 
 <!-- Přidání knihovny Marked.js pro převod Markdown na HTML -->
 <script src="https://cdn.jsdelivr.net/npm/marked@4.0.12/marked.min.js"></script>
 
 <script>
-    // URL pro wishlist.md soubor na GitHubu
+    // URL pro wishlist.md soubor na GitHubu přes jsDelivr CDN
     const markdownUrl = "https://cdn.jsdelivr.net/gh/4ME280-Webdesign-a-uzivatelska-rozhrani/lord-squeegee-wishlist@main/wishlist.md";
 
     // Funkce pro načtení a zobrazení Markdown souboru
