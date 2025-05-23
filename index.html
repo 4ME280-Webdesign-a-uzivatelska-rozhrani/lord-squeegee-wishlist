@@ -25,7 +25,8 @@
   <!-- marked.js from CDN -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script>
-    const markdownUrl = "https://cdn.jsdelivr.net/gh/4ME280-Webdesign-a-uzivatelska-rozhrani/lord-squeegee-wishlist@main/wishlist.md";
+    // URL na tvůj wishlist.md soubor
+    const markdownUrl = "https://raw.githubusercontent.com/username/repository/branch/path/to/wishlist.md"; 
 
     fetch(markdownUrl)
       .then(res => res.text())
