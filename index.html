@@ -16,18 +16,24 @@
       max-width: 100%;
       height: auto;
     }
-    form {
-      margin-top: 10px;
+    .wishlist-item {
+      margin-bottom: 20px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
     }
-    input[type="text"] {
-      padding: 5px;
-      font-size: 16px;
-      width: 250px;
+    .wishlist-item input {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
     }
-    button {
-      padding: 5px 10px;
-      font-size: 16px;
-      margin-top: 10px;
+    .wishlist-item button {
+      padding: 8px 15px;
+      margin-top: 5px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 3px;
     }
   </style>
 </head>
@@ -38,77 +44,76 @@
   <!-- marked.js from CDN -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script>
-    const jsonBinUrl = "https://api.jsonbin.io/v3/b/683040d38960c979a5a00bae";
-    const secretKey = "$2a$10$IUhlviZDWifNgc.S50T5pumARj9LSbg0lNxO5sG6xcqPvt.hTpxfW"; // Zadej svůj skutečný SECRET KEY z jsonbin.io
+    // Zadej svůj Bin Key a Master Key
+    const binKey = "683040d38960c979a5a00bae";  // Tvůj JSON Bin Key
+    const masterKey = "$2a$10$IUhlviZDWifNgc.S50T5pumARj9LSbg0lNxO5sG6xcqPvt.hTpxfW"; // Tvůj Master Key
 
-    // Načítání dat z JSON Bin
-    fetch(jsonBinUrl, {
-      method: "GET",
+    // URL pro API JSON Bin
+    const apiUrl = `https://api.jsonbin.io/v3/b/${binKey}`;
+
+    // Načtení wishlistu z JSON Bin
+    fetch(apiUrl, {
       headers: {
-        "Authorization": `Bearer ${secretKey}`
+        "X-Master-Key": masterKey,
+        "Content-Type": "application/json"
       }
     })
-      .then(res => res.json())
-      .then(data => {
-        let content = '<ul>';
-        
-        // Iterace přes všechny položky
-        data.record.forEach((item, index) => {
-          content += `
-            <li>
-              <h2>${item.nazev}</h2>
-              <a href="${item.url}" target="_blank">${item.url}</a>
-              <p><strong>Cena:</strong> ${item.cena}</p>
-              <p><strong>Osoba:</strong> 
-                <form id="form-${index}">
-                  <input type="text" id="osoba-${index}" value="${item.osoba || ''}" placeholder="Napiš jméno">
-                  <button type="submit">Uložit</button>
-                </form>
-              </p>
-              <img src="${item.obrazek}" alt="${item.nazev}">
-            </li>
-          `;
-        });
-        
-        content += '</ul>';
-        
-        // Zobrazení seznamu
-        document.getElementById("content").innerHTML = content;
-        
-        // Při odeslání formuláře upravujeme položku "osoba" a odesíláme zpět
-        data.record.forEach((item, index) => {
-          const form = document.getElementById(`form-${index}`);
-          form.addEventListener('submit', (e) => {
-            e.preventDefault(); // Zamezí defaultnímu odeslání formuláře
-            const osoba = document.getElementById(`osoba-${index}`).value;
-            item.osoba = osoba; // Uložení jména osoby do položky
+    .then(res => res.json())
+    .then(data => {
+      const wishlist = data.record; // Načteme data
 
-            // Odeslání změn zpět do JSON Bin
-            updateBin(data);
-          });
-        });
-      })
-      .catch(err => {
-        document.getElementById("content").innerText = "Chyba při načítání wishlistu.";
-        console.error(err);
+      let contentHtml = "";
+      wishlist.forEach((item, index) => {
+        contentHtml += `
+          <div class="wishlist-item">
+            <h3>${item.name}</h3>
+            <p><a href="${item.url}" target="_blank">${item.url}</a></p>
+            <p>${item.price}</p>
+            <img src="${item.image}" alt="${item.name}">
+            <p>
+              <label for="person-${index}">Jméno osoby, která slíbila koupi:</label>
+              <input type="text" id="person-${index}" value="${item.person || ''}" placeholder="Zadej jméno">
+              <button onclick="saveName(${index})">Uložit jméno</button>
+            </p>
+          </div>
+        `;
       });
 
-    // Funkce pro odeslání dat zpět do JSON Bin
-    function updateBin(data) {
-      fetch(jsonBinUrl, {
-        method: "PUT",
+      document.getElementById("content").innerHTML = contentHtml;
+    })
+    .catch(err => {
+      document.getElementById("content").innerText = "Chyba při načítání wishlistu.";
+      console.error(err);
+    });
+
+    // Funkce pro uložení jména do JSON Bin
+    function saveName(index) {
+      const name = document.getElementById(`person-${index}`).value;
+
+      fetch(apiUrl, {
+        method: 'PUT',
         headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${secretKey}`
+          "X-Master-Key": masterKey,
+          "Content-Type": "application/json"
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify({
+          record: {
+            ...wishlist,
+            [index]: {
+              ...wishlist[index],
+              person: name
+            }
+          }
+        })
       })
-      .then(res => res.json())
-      .then(updatedData => {
-        console.log("Data úspěšně aktualizována:", updatedData);
+      .then(response => response.json())
+      .then(data => {
+        alert("Jméno bylo úspěšně uloženo.");
+        location.reload(); // Načteme stránku znovu, aby se projevily změny
       })
-      .catch(err => {
-        console.error("Chyba při aktualizaci dat:", err);
+      .catch(error => {
+        console.error("Chyba při ukládání jména:", error);
+        alert("Došlo k chybě při ukládání.");
       });
     }
   </script>
