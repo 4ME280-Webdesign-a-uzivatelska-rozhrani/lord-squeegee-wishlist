@@ -1,6 +1,5 @@
 ---
 wishlist:
-
 1. Let na Měsíc  
    https://www.spacex.com/  
    500 000 000 000 Kč
