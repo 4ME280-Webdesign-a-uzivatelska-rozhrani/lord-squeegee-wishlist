@@ -1,92 +1,41 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
-  <meta charset="UTF-8">
-  <title>Dynamický Wishlist</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Wishlist</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f4f9;
-      margin: 0;
-      padding: 20px;
+      font-family: sans-serif;
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+      line-height: 1.6;
     }
-    .wishlist {
-      list-style: none;
-      padding: 0;
-    }
-    .wishlist li {
-      background-color: #fff;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      padding: 20px;
-      margin-bottom: 20px;
-      display: flex;
-      align-items: center;
-    }
-    .wishlist img {
-      max-width: 200px;
+    img {
+      max-width: 100%;
       height: auto;
-      margin-right: 20px;
-    }
-    .wishlist h2 {
-      margin: 0;
-      font-size: 24px;
-    }
-    .wishlist .price {
-      font-weight: bold;
-      font-size: 18px;
-      color: #d9534f;
-    }
-    .wishlist a {
-      text-decoration: none;
-      color: #333;
-    }
-    .wishlist a:hover {
-      text-decoration: underline;
     }
   </style>
-  <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
 </head>
 <body>
-  <div id="wishlist-container"></div>
+  <h1>Wishlist</h1>
+  <div id="content">Načítám wishlist...</div>
 
+  <!-- marked.js from CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script>
-    async function loadWishlist() {
-      try {
-        // Načteme Markdown soubor z GitHubu přes jsDelivr
-        const response = await fetch('https://cdn.jsdelivr.net/gh/4ME280-Webdesign-a-uzivatelska-rozhrani/lord-squeegee-wishlist@main/wishlist.md');
-        const markdown = await response.text();
+    const markdownUrl = "https://cdn.jsdelivr.net/gh/4ME280-Webdesign-a-uzivatelska-rozhrani/lord-squeegee-wishlist@main/wishlist.md";
 
-        // Získání Front Matter YAML z Markdownu
-        const yamlContent = markdown.match(/^---\n([\s\S]+?)\n---/);
-        if (!yamlContent) {
-          throw new Error('YAML Front Matter nenalezen.');
-        }
-
-        const yamlData = jsyaml.load(yamlContent[1]);
-
-        // Vytvoříme HTML pro wishlist
-        const wishlistHTML = yamlData.wishlist.map(item => `
-          <li>
-            <a href="${item.url}">
-              <img src="${item.image}" alt="${item.product}">
-              <div>
-                <h2>${item.product}</h2>
-                <p class="price">${item.price}</p>
-              </div>
-            </a>
-          </li>
-        `).join('');
-
-        // Vložíme vytvořený HTML do kontejneru
-        document.getElementById('wishlist-container').innerHTML = `<ul class="wishlist">${wishlistHTML}</ul>`;
-      } catch (error) {
-        console.error('Chyba při načítání wishlistu:', error);
-        document.getElementById('wishlist-container').innerHTML = `<p>Chyba při načítání wishlistu. Zkuste to prosím později.</p>`;
-      }
-    }
-
-    loadWishlist();
+    fetch(markdownUrl)
+      .then(res => res.text())
+      .then(md => {
+        document.getElementById("content").innerHTML = marked.parse(md);
+      })
+      .catch(err => {
+        document.getElementById("content").innerText = "Chyba při načítání wishlistu.";
+        console.error(err);
+      });
   </script>
 </body>
 </html>
