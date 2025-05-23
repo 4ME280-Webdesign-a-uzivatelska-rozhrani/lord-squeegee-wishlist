@@ -3,75 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Wishlist</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: #f4f4f9;
-            color: #333;
-        }
-        h1 {
-            text-align: center;
-            color: #007BFF;
-        }
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        .wishlist-item {
-            display: flex;
-            align-items: center;
-            border-bottom: 1px solid #ddd;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-        }
-        .wishlist-item img {
-            width: 100px;
-            height: auto;
-            margin-right: 15px;
-        }
-        .wishlist-item a {
-            text-decoration: none;
-            color: #007BFF;
-        }
-    </style>
+    <title>Wishlist</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
+    <div class="container">
+        <h1 class="my-4">Můj Wishlist</h1>
+        <div id="wishlist"></div>
+    </div>
 
-<div class="container">
-    <h1>My Wishlist</h1>
-    <div id="wishlist-container"></div>
-</div>
+    <script>
+        // GitHub RAW URL pro wishlist.md
+        const markdownUrl = 'https://raw.githubusercontent.com/4ME280-Webdesign-a-uzivatelska-rozhrani/lord-squeegee-wishlist/main/wishlist.md';
 
-<!-- Přidání knihovny Marked.js pro převod Markdown na HTML -->
-<script src="https://cdn.jsdelivr.net/npm/marked@4.0.12/marked.min.js"></script>
+        // Funkce pro načtení Markdown souboru
+        function loadWishlist() {
+            fetch(markdownUrl)
+                .then(response => response.text())
+                .then(markdown => {
+                    // Převeď Markdown na HTML
+                    const htmlContent = marked(markdown);
 
-<script>
-    // URL pro wishlist.md soubor na GitHubu přes "raw" odkaz
-    const markdownUrl = "https://raw.githubusercontent.com/4ME280-Webdesign-a-uzivatelska-rozhrani/lord-squeegee-wishlist/main/wishlist.md";
+                    // Zobrazíme obsah ve stránce
+                    $('#wishlist').html(htmlContent);
+                })
+                .catch(error => {
+                    console.error("Chyba při načítání wishlistu:", error);
+                    $('#wishlist').html('<p>Došlo k chybě při načítání wishlistu.</p>');
+                });
+        }
 
-    // Funkce pro načtení a zobrazení Markdown souboru
-    function loadWishlist() {
-        fetch(markdownUrl)
-            .then(response => response.text())
-            .then(text => {
-                // Používáme knihovnu Marked.js pro převod Markdown na HTML
-                const htmlContent = marked(text);
-                document.getElementById('wishlist-container').innerHTML = htmlContent;
-            })
-            .catch(error => {
-                console.error("Chyba při načítání wishlistu:", error);
-            });
-    }
-
-    // Zavolání funkce pro načtení wishlistu při načtení stránky
-    window.onload = loadWishlist;
-</script>
-
+        // Načíst wishlist při načtení stránky
+        $(document).ready(function() {
+            loadWishlist();
+        });
+    </script>
 </body>
 </html>
