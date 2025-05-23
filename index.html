@@ -10,36 +10,33 @@
 </head>
 <body>
     <div class="container">
-        <h1 class="my-4">Můj Wishlist</h1>
-        <div id="wishlist"></div>
+        <h1 class="my-4 text-center">Můj Wishlist</h1>
+        <div id="wishlist" class="list-group"></div>
     </div>
 
     <script>
-        // GitHub URL převedená na jsDelivr
+        // URL pro načítání wishlist.md z GitHubu přes jsDelivr
         const markdownUrl = 'https://cdn.jsdelivr.net/gh/4ME280-Webdesign-a-uzivatelska-rozhrani/lord-squeegee-wishlist@main/wishlist.md';
 
-        // Funkce pro načtení Markdown souboru
+        // Funkce pro načtení a zobrazení wishlistu
         function loadWishlist() {
             fetch(markdownUrl)
                 .then(response => {
-                    console.log("Status odpovědi: ", response.status); // Vypíšeme stavový kód
                     if (!response.ok) {
                         throw new Error("Chyba při načítání souboru Markdown.");
                     }
                     return response.text();
                 })
                 .then(markdown => {
-                    console.log("Načtený Markdown:", markdown); // Vypíšeme načtený Markdown
                     // Převeď Markdown na HTML
                     const htmlContent = marked(markdown);
-                    console.log("Převedený HTML obsah:", htmlContent); // Vypíšeme převedený HTML
 
-                    // Zobrazíme obsah ve stránce
+                    // Zobrazíme obsah na stránce
                     $('#wishlist').html(htmlContent);
                 })
                 .catch(error => {
                     console.error("Chyba při načítání wishlistu:", error);
-                    $('#wishlist').html('<p>Došlo k chybě při načítání wishlistu.</p>');
+                    $('#wishlist').html('<p>Došlo k chybě při načítání wishlistu. Zkuste to prosím později.</p>');
                 });
         }
 
