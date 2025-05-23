@@ -48,4 +48,4 @@
    - **Cena**: cca 300,000 Kč – 500,000 Kč  
 ![image](https://github.com/user-attachments/assets/b8b24d53-f0b5-4604-9d2c-7312066e7489)
 
-# Epic Wishlist
+#wishlist
