@@ -27,7 +27,7 @@
 
 6. **Jízda v Supercar na závodní dráze (F1 style)**  
    [https://www.supercardrive.com/](https://www.supercardrive.com/)  
-   30 000 Kč  
+   (30 000 Kč)
    ![Jízda v Supercar](https://github.com/user-attachments/assets/c4e9e7c6-4d6c-4d14-bf37-976b13c554d2)
 
 7. **Letecký simulátor s pilotem – vlastní pilotní hodina**  
