@@ -46,10 +46,12 @@
   <script>
     // Zadej svůj Bin Key a Master Key
     const binKey = "683040d38960c979a5a00bae";  // Tvůj JSON Bin Key
-    const masterKey = "$2a$10$IUhlviZDWifNgc.S50T5pumARj9LSbg0lNxO5sG6xcqPvt.hTpxfW"; // Tvůj Master Key
+    const masterKey = "TvůjMasterKey"; // Tvůj Master Key
 
     // URL pro API JSON Bin
     const apiUrl = `https://api.jsonbin.io/v3/b/${binKey}`;
+
+    let wishlist = [];
 
     // Načtení wishlistu z JSON Bin
     fetch(apiUrl, {
@@ -60,8 +62,16 @@
     })
     .then(res => res.json())
     .then(data => {
-      const wishlist = data.record; // Načteme data
+      wishlist = data.record; // Načteme data
+      renderWishlist(); // Zavoláme funkci pro zobrazení wishlistu
+    })
+    .catch(err => {
+      document.getElementById("content").innerText = "Chyba při načítání wishlistu.";
+      console.error(err);
+    });
 
+    // Funkce pro zobrazení wishlistu
+    function renderWishlist() {
       let contentHtml = "";
       wishlist.forEach((item, index) => {
         contentHtml += `
@@ -80,15 +90,14 @@
       });
 
       document.getElementById("content").innerHTML = contentHtml;
-    })
-    .catch(err => {
-      document.getElementById("content").innerText = "Chyba při načítání wishlistu.";
-      console.error(err);
-    });
+    }
 
     // Funkce pro uložení jména do JSON Bin
     function saveName(index) {
       const name = document.getElementById(`person-${index}`).value;
+
+      // Ujistíme se, že máme správně upravený záznam
+      wishlist[index].person = name;
 
       fetch(apiUrl, {
         method: 'PUT',
@@ -97,19 +106,13 @@
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          record: {
-            ...wishlist,
-            [index]: {
-              ...wishlist[index],
-              person: name
-            }
-          }
+          record: wishlist
         })
       })
       .then(response => response.json())
       .then(data => {
         alert("Jméno bylo úspěšně uloženo.");
-        location.reload(); // Načteme stránku znovu, aby se projevily změny
+        renderWishlist(); // Znovu renderujeme wishlist po změně
       })
       .catch(error => {
         console.error("Chyba při ukládání jména:", error);
