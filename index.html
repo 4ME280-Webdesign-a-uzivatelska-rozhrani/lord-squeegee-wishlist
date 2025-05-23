@@ -15,16 +15,24 @@
     </div>
 
     <script>
-        // GitHub RAW URL pro wishlist.md
+        // GitHub URL převedená na jsDelivr
         const markdownUrl = 'https://cdn.jsdelivr.net/gh/4ME280-Webdesign-a-uzivatelska-rozhrani/lord-squeegee-wishlist@main/wishlist.md';
 
         // Funkce pro načtení Markdown souboru
         function loadWishlist() {
             fetch(markdownUrl)
-                .then(response => response.text())
+                .then(response => {
+                    console.log("Status odpovědi: ", response.status); // Vypíšeme stavový kód
+                    if (!response.ok) {
+                        throw new Error("Chyba při načítání souboru Markdown.");
+                    }
+                    return response.text();
+                })
                 .then(markdown => {
+                    console.log("Načtený Markdown:", markdown); // Vypíšeme načtený Markdown
                     // Převeď Markdown na HTML
                     const htmlContent = marked(markdown);
+                    console.log("Převedený HTML obsah:", htmlContent); // Vypíšeme převedený HTML
 
                     // Zobrazíme obsah ve stránce
                     $('#wishlist').html(htmlContent);
