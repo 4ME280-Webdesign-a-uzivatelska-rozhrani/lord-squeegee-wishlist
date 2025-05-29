@@ -29,87 +29,98 @@
       font-size: 16px;
       margin-top: 10px;
     }
+    .ulozeno {
+      color: green;
+      font-size: 14px;
+      margin-left: 10px;
+    }
   </style>
 </head>
 <body>
   <h1>Wishlist</h1>
   <div id="content">Načítám wishlist...</div>
 
-  <!-- marked.js from CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script>
-    const jsonBinUrl = "https://api.jsonbin.io/v3/b/683040d38960c979a5a00bae";
-    const secretKey = "$2a$10$IUhlviZDWifNgc.S50T5pumARj9LSbg0lNxO5sG6xcqPvt.hTpxfW"; // Zadej svůj skutečný SECRET KEY z jsonbin.io
+    const jsonBinUrl = "https://api.jsonbin.io/v3/b/683040d38960c979a5a00bae/latest";
+    const secretKey = "$2a$10$IUhlviZDWifNgc.S50T5pumARj9LSbg0lNxO5sG6xcqPvt.hTpxfW";
 
-    // Načítání dat z JSON Bin
+    // Načtení wishlistu
     fetch(jsonBinUrl, {
       method: "GET",
       headers: {
         "Authorization": `Bearer ${secretKey}`
       }
     })
-      .then(res => res.json())
-      .then(data => {
-        let content = '<ul>';
-        
-        // Iterace přes všechny položky
-        data.record.forEach((item, index) => {
-          content += `
-            <li>
-              <h2>${item.nazev}</h2>
-              <a href="${item.url}" target="_blank">${item.url}</a>
-              <p><strong>Cena:</strong> ${item.cena}</p>
-              <p><strong>Osoba:</strong> 
-                <form id="form-${index}">
-                  <input type="text" id="osoba-${index}" value="${item.osoba || ''}" placeholder="Napiš jméno">
-                  <button type="submit">Uložit</button>
-                </form>
-              </p>
-              <img src="${item.obrazek}" alt="${item.nazev}">
-            </li>
-          `;
-        });
-        
-        content += '</ul>';
-        
-        // Zobrazení seznamu
-        document.getElementById("content").innerHTML = content;
-        
-        // Při odeslání formuláře upravujeme položku "osoba" a odesíláme zpět
-        data.record.forEach((item, index) => {
-          const form = document.getElementById(`form-${index}`);
-          form.addEventListener('submit', (e) => {
-            e.preventDefault(); // Zamezí defaultnímu odeslání formuláře
-            const osoba = document.getElementById(`osoba-${index}`).value;
-            item.osoba = osoba; // Uložení jména osoby do položky
+    .then(res => res.json())
+    .then(data => renderWishlist(data.record))
+    .catch(err => {
+      document.getElementById("content").innerText = "Chyba při načítání wishlistu.";
+      console.error(err);
+    });
 
-            // Odeslání změn zpět do JSON Bin
-            updateBin(data);
-          });
-        });
-      })
-      .catch(err => {
-        document.getElementById("content").innerText = "Chyba při načítání wishlistu.";
-        console.error(err);
+    // Funkce pro vykreslení wishlistu
+    function renderWishlist(items) {
+      let content = '<ul>';
+      items.forEach((item, index) => {
+        content += `
+          <li>
+            <h2>${item.nazev}</h2>
+            <a href="${item.url}" target="_blank">${item.url}</a>
+            <p><strong>Cena:</strong> ${item.cena}</p>
+            <p><strong>Osoba:</strong></p>
+            <form id="form-${index}">
+              <input type="text" id="osoba-${index}" value="${item.osoba || ''}" placeholder="Napiš jméno">
+              <button type="submit">Uložit</button>
+              <span id="ulozeno-${index}" class="ulozeno" style="display:none;">Uloženo ✓</span>
+            </form>
+            <img src="${item.obrazek}" alt="${item.nazev}">
+          </li>
+        `;
       });
+      content += '</ul>';
+      document.getElementById("content").innerHTML = content;
+
+      // Při odeslání formuláře se uloží jméno a odešlou změny
+      items.forEach((item, index) => {
+        const form = document.getElementById(`form-${index}`);
+        form.addEventListener("submit", (e) => {
+          e.preventDefault();
+          const osobaInput = document.getElementById(`osoba-${index}`);
+          const osoba = osobaInput.value.trim();
+          item.osoba = osoba;
+
+          updateBin({ record: items })
+            .then(() => {
+              // Zobraz zprávu o uložení
+              const ulozeno = document.getElementById(`ulozeno-${index}`);
+              ulozeno.style.display = 'inline';
+              setTimeout(() => ulozeno.style.display = 'none', 2000);
+            })
+            .catch(err => {
+              alert("Chyba při ukládání dat.");
+              console.error(err);
+            });
+        });
+      });
+    }
 
     // Funkce pro odeslání dat zpět do JSON Bin
-    function updateBin(data) {
-      fetch(jsonBinUrl, {
+    async function updateBin(data) {
+      const res = await fetch("https://api.jsonbin.io/v3/b/683040d38960c979a5a00bae", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${secretKey}`
         },
         body: JSON.stringify(data)
-      })
-      .then(res => res.json())
-      .then(updatedData => {
-        console.log("Data úspěšně aktualizována:", updatedData);
-      })
-      .catch(err => {
-        console.error("Chyba při aktualizaci dat:", err);
       });
+
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`Chyba při PUT: ${text}`);
+      }
+
+      return res.json();
     }
   </script>
 </body>
